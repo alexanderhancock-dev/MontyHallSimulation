@@ -22,11 +22,17 @@ static SimResult RunSim()
     SimResult result = {};
     bool doors[3] = {};
     int num = rand();
+
+    // Choose a random door to have the prize behind (true means prize, false means empty)
     doors[0] = (num % 3) == 0;
     doors[1] = ((num + 1) % 3) == 0;
     doors[2] = ((num + 2) % 3) == 0;
+
+    // Pick the player's originally chosen door
     int playerDoor = rand() % 3;
     int openedDoor = 0;
+
+    // Choose the door opened by the gameshow host as the first door found that is empty and not chosen by the player
     for (int i = 0; i < 3; i++)
     {
         if (i != playerDoor && !doors[i])
@@ -34,9 +40,12 @@ static SimResult RunSim()
             openedDoor = i;
         }
     }
+
+    // Randomly decide whether to switch doors or keep doors
     if (rand() % 2)
     {
         result.switched = true;
+        // Find the door to switch to and set success if the prize is behind it
         for (int i = 0; i < 3; i++)
         {
             if (i != playerDoor && i != openedDoor)
@@ -45,6 +54,7 @@ static SimResult RunSim()
     }
     else
     {
+	// Stick with the player's first door and set success if the prize is behind it
         result.switched = false;
         result.success = doors[playerDoor];
     }
@@ -52,6 +62,7 @@ static SimResult RunSim()
     return result;
 }
 
+// Add the results of one simulation to the tally. Only add another stay attempt if result.switched is false, and only add another switch attempt if result.switched is true, same for the success value
 static void TallyResult(SimResult result, ResultTally& tally)
 {
     tally.stayAttempts += !result.switched;
@@ -63,7 +74,9 @@ static void TallyResult(SimResult result, ResultTally& tally)
 
 int main(int argc, char **argv)
 {
+    // Seed the random number generator
     srand((unsigned int)time(0));
+    // Check the command line arguments
     if (argc < 2)
     {
         std::cout << "The number of simulations must be specified.\n";
@@ -86,6 +99,7 @@ int main(int argc, char **argv)
         TallyResult(RunSim(), tally);
     }
 
+    // Report the success rates as a fraction of the successes/attempts multiplied by 100 (percentage)
     std::cout << "Switch Success Rate was: " << 100.0 * (double)tally.switchSuccesses / (double)tally.switchAttempts << "%\n";
     std::cout << "Stay Success Rate was: " << 100.0 * (double)tally.staySuccesses / (double)tally.stayAttempts << "%\n";
 }
