@@ -99,7 +99,14 @@ int main(int argc, char **argv)
         TallyResult(RunSim(), tally);
     }
 
-    // Report the success rates as a fraction of the successes/attempts multiplied by 100 (percentage)
-    std::cout << "Switch Success Rate was: " << 100.0 * (double)tally.switchSuccesses / (double)tally.switchAttempts << "%\n";
-    std::cout << "Stay Success Rate was: " << 100.0 * (double)tally.staySuccesses / (double)tally.stayAttempts << "%\n";
+    // Report the success rates as a fraction of the successes/attempts multiplied by 100 (percentage) unless there were no attempts of that type made.
+    if (tally.switchAttempts < 1)
+        std::cout << "No simulations where the player switched their choice were performed.\n";
+    else
+        std::cout << "Switch Success Rate was: " << 100.0 * (double)tally.switchSuccesses / (double)tally.switchAttempts << "%\n";
+
+    if (tally.stayAttempts < 1)
+        std::cout << "No simulations where the player kept their choice were performed.\n";
+    else
+        std::cout << "Stay Success Rate was: " << 100.0 * (double)tally.staySuccesses / (double)tally.stayAttempts << "%\n";
 }
